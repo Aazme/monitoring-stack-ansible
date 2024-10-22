@@ -1,0 +1,44 @@
+---
+- name: Install Docker dependencies
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - python3-pip
+      - virtualenv
+      - python3-setuptools
+    state: latest
+    update_cache: true
+
+- name: Add Docker's official GPG key
+  apt_key:
+    url: "{{ docker_gpg_key_url }}"
+    state: present
+
+- name: Set up the Docker repository
+  apt_repository:
+    repo: "{{ docker_repo }}"
+    state: present
+    filename: docker
+
+- name: Update apt cache if Docker repo was added
+  apt:
+    update_cache: true
+
+- name: Install Docker Engine
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: true
+
+- name: Install Docker SDK for Python
+  pip:
+    name: docker
+
+- name: Ensure Docker service is started and enabled
+  service:
+    name: docker
+    state: started
+    enabled: yes
