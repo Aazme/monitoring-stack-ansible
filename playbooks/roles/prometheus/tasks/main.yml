@@ -1,0 +1,41 @@
+---
+- name: Create Prometheus configuration directory
+  file:
+    path: /etc/prometheus
+    state: directory
+    mode: '0755'
+- name: Create Prometheus Data directory
+  file:
+    path: /etc/prometheus/data
+    state: directory
+    mode: '0755'
+
+- name: Deploy Prometheus configuration
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    mode: '0644'
+
+- name: Deploy Prometheus alert rules
+  template:
+    src: alert_rules.yml.j2
+    dest: /etc/prometheus/alert_rules.yml
+    mode: '0644'
+
+- name: Deploy Prometheus container
+  docker_container:
+    name: prometheus
+    image: prom/prometheus:v2.41.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - "/etc/prometheus:/etc/prometheus"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    user: "root"  # Not good idea its used to access dockersock, TODO: use another approach
+    networks:
+      - name: monitoring
+    labels:
+      prometheus_job: "prometheus"
+    restart_policy: always
+
+

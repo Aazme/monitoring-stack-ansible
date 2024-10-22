@@ -1,0 +1,22 @@
+groups:
+  - name: ContainerAlerts
+    rules:
+      - alert: HighContainerCPUUsage
+        expr: |
+          sum(rate(container_cpu_usage_seconds_total[5m])) by (container_label_com_docker_compose_service) * 100 > {{ cpu_usage_threshold | default(80) }}
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %}"
+          description: "Container {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %} is using high CPU. Value: {% raw %}{{ $value }}{% endraw %}%"
+
+      - alert: HighContainerMemoryUsage
+        expr: |
+          sum(container_memory_usage_bytes) by (container_label_com_docker_compose_service) / sum(machine_memory_bytes) * 100 > {{ memory_usage_threshold | default(80) }}
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Memory usage on {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %}"
+          description: "Container {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %} is using high memory. Value: {% raw %}{{ $value }}{% endraw %}%"
