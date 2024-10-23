@@ -9,4 +9,4 @@
       - alertmanager
       - loki
       - docker_logging
-      
+      - common

@@ -1,0 +1,5 @@
+---
+- name: Create Docker network
+  docker_network:
+    name: monitoring
+    state: present
