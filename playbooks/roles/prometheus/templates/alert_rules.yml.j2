@@ -1,22 +1,22 @@
 groups:
-  - name: ContainerAlerts
+  - name: NodeAlerts
     rules:
-      - alert: HighContainerCPUUsage
+      - alert: HighNodeCPUUsage
         expr: |
-          sum(rate(container_cpu_usage_seconds_total[5m])) by (container_label_com_docker_compose_service) * 100 > {{ cpu_usage_threshold | default(80) }}
+          100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > {{ cpu_usage_threshold | default(80) }}
         for: 2m
         labels:
           severity: warning
         annotations:
-          summary: "High CPU usage on {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %}"
-          description: "Container {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %} is using high CPU. Value: {% raw %}{{ $value }}{% endraw %}%"
+          summary: "High CPU usage on {% raw %}{{ $labels.instance }}{% endraw %}"
+          description: "Node {% raw %}{{ $labels.instance }}{% endraw %} is using high CPU. Value: {% raw %}{{ $value }}{% endraw %}%"
 
-      - alert: HighContainerMemoryUsage
+      - alert: HighNodeMemoryUsage
         expr: |
-          sum(container_memory_usage_bytes) by (container_label_com_docker_compose_service) / sum(machine_memory_bytes) * 100 > {{ memory_usage_threshold | default(80) }}
+          100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > {{ memory_usage_threshold | default(80) }}
         for: 2m
         labels:
           severity: warning
         annotations:
-          summary: "High Memory usage on {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %}"
-          description: "Container {% raw %}{{ $labels.container_label_com_docker_compose_service }}{% endraw %} is using high memory. Value: {% raw %}{{ $value }}{% endraw %}%"
+          summary: "High Memory usage on {% raw %}{{ $labels.instance }}{% endraw %}"
+          description: "Node {% raw %}{{ $labels.instance }}{% endraw %} is using high memory. Value: {% raw %}{{ $value }}{% endraw %}%"
