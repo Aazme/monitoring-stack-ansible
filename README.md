@@ -7,9 +7,12 @@ Welcome to the Monitoring Stack Deployment project! This repository provides an 
 Code in Action: 
 
 1. DigitalOcean:
+
+   
 https://github.com/user-attachments/assets/9448eb22-d5df-42fd-9160-8410cd08cd73
 
 2. Vagrant:
+   
 https://github.com/user-attachments/assets/dedc1d7e-092d-461d-a9ae-a3da90c16c1f
 
 
