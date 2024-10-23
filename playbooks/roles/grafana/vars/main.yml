@@ -1,0 +1,15 @@
+---
+grafana_username: "admin"
+grafana_password: "admin"
+grafana_url: "http://localhost:3000" 
+datasources:
+  - name: "Prometheus"
+    ds_type: "prometheus"
+    access: "proxy"
+    url: "http://prometheus:9090"
+    isDefault: true
+  - name: "Loki"
+    ds_type: "loki"
+    access: "proxy"
+    url: "http://loki:3100"
+

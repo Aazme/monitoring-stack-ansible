@@ -1,0 +1,38 @@
+---
+- name: Create Grafana data directory
+  file:
+    path: /var/lib/grafana
+    state: directory
+    owner: "472"
+    group: "472"
+    mode: '0755'
+
+- name: Deploy Grafana container
+  docker_container:
+    name: grafana
+    image: grafana/grafana:10.4.11
+    ports:
+      - "3000:3000"
+    volumes:
+      - "/var/lib/grafana:/var/lib/grafana"
+    labels:
+      prometheus_job: "grafana"
+    networks:
+      - name: monitoring
+    restart_policy: always
+
+- name: Wait for Grafana to be available
+  uri:
+    url: "http://localhost:3000/api/health"
+    method: GET
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 5
+
+- name: Configure Grafana data sources
+  include_tasks: configure_datasources.yml
+
+- name: Import Grafana dashboard
+  include_tasks: import_dashboard.yml

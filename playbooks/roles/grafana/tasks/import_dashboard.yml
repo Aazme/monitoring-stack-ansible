@@ -1,0 +1,17 @@
+---
+
+- name: Deploy Grafana dashboards
+  template:
+    src: grafana_dashboard.json.j2
+    dest: /var/lib/grafana/grafana_dashboard.json
+    mode: '0644'
+
+- name: Import Grafana dashboard
+  grafana_dashboard:
+    path: "/var/lib/grafana/grafana_dashboard.json"
+    state: present
+    validate_certs: false
+    overwrite: true
+    url_username: "{{ grafana_username }}"
+    url_password: "{{ grafana_password }}"
+    url: "{{grafana_url}}"

@@ -1,0 +1,14 @@
+---
+- name: Create Grafana data sources
+  grafana_datasource:
+    name: "{{ item.name }}"
+    ds_type: "{{ item.ds_type }}"
+    access: "{{ item.access }}"
+    ds_url: "{{ item.url }}"  
+    url: "{{ grafana_url }}"
+    is_default: "{{ item.isDefault | default(false) }}"
+    validate_certs: false
+    basic_auth_user: "{{ grafana_username }}"
+    basic_auth_password: "{{ grafana_password }}"
+  loop: "{{ datasources }}"
+
