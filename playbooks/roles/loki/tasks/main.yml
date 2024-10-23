@@ -1,0 +1,28 @@
+---
+- name: Create Loki configuration directory
+  file:
+    path: /etc/loki
+    state: directory
+    mode: '0755'
+
+- name: Deploy Loki configuration
+  template:
+    src: loki-config.yml.j2
+    dest: /etc/loki/loki-config.yml
+    mode: '0644'
+
+- name: Deploy Loki container
+  docker_container:
+    name: loki
+    image: grafana/loki:3.1.2
+    ports:
+      - "3100:3100"
+    volumes:
+      - "/etc/loki:/etc/loki"
+    command: ['-config.file=/etc/loki/loki-config.yml']
+    networks:
+      - name: monitoring
+    labels:
+      prometheus_job: "loki"
+    restart_policy: always
+
