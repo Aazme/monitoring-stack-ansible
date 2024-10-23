@@ -3,10 +3,11 @@
   become: true
   roles:
       - docker
-      - prometheus
-      - node_exporter
-      - grafana
-      - alertmanager
-      - loki
       - docker_logging
       - common
+      - prometheus
+      - loki
+      - node_exporter
+      - alertmanager
+      - cadvisor
+      - grafana
