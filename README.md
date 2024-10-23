@@ -1,6 +1,19 @@
+
+
 # Monitoring Stack Deployment with Ansible
 
 Welcome to the Monitoring Stack Deployment project! This repository provides an automated solution to deploy a comprehensive monitoring stack using Ansible. The stack includes Prometheus, Grafana, Loki, AlertManager, Node Exporter, and cAdvisor, orchestrated with Docker containers. The setup is designed for testing purposes and suitable for development environments.
+
+Code in Action: 
+
+1. DigitalOcean:
+https://github.com/user-attachments/assets/9448eb22-d5df-42fd-9160-8410cd08cd73
+
+2. Vagrant:
+https://github.com/user-attachments/assets/dedc1d7e-092d-461d-a9ae-a3da90c16c1f
+
+
+
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -91,8 +104,21 @@ Before you begin, ensure you have the following installed on your control machin
    - Note: The Ansible playbooks include roles to install Docker on target hosts. However, if you prefer to install Docker manually:
      ```bash
      # For Ubuntu/Debian
-     sudo apt update
-     sudo apt install docker-ce docker-ce-cli containerd.io -y
+     # Check https://docs.docker.com/engine/install/ubuntu/
+     # Add Docker's official GPG key:
+      sudo apt-get update
+      sudo apt-get install ca-certificates curl
+      sudo install -m 0755 -d /etc/apt/keyrings
+      sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+      sudo chmod a+r /etc/apt/keyrings/docker.asc
+      
+      # Add the repository to Apt sources:
+      echo \
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      sudo apt-get update
+      sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
      ```
 
 ## Installation
@@ -299,4 +325,3 @@ This project is licensed under the MIT License. See the LICENSE file for details
 For questions or support, please open an issue on the GitHub repository or contact the maintainer:
 
 - **GitHub**: [https://github.com/Aazme/monitoring-stack-ansible](https://github.com/Aazme/monitoring-stack-ansible)
-- **Email**: your.email@example.com
