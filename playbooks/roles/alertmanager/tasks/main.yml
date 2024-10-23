@@ -1,0 +1,28 @@
+---
+- name: Create AlertManager configuration directory
+  file:
+    path: /etc/alertmanager
+    state: directory
+    mode: '0755'
+
+- name: Deploy AlertManager configuration
+  template:
+    src: alertmanager.yml.j2
+    dest: /etc/alertmanager/alertmanager.yml
+    mode: '0644'
+
+- name: Deploy AlertManager container
+  docker_container:
+    name: alertmanager
+    image: prom/alertmanager:v0.27.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - "/etc/alertmanager:/etc/alertmanager"
+    command: "--config.file=/etc/alertmanager/alertmanager.yml"
+    networks:
+      - name: monitoring
+    labels:
+      prometheus_job: "alertmanager"
+    restart_policy: always
+
