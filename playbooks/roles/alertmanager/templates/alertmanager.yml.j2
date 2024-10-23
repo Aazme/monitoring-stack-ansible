@@ -2,17 +2,17 @@ global:
   resolve_timeout: 5m
 
 route:
-  receiver: "slack-notifications"
+  receiver: "telegram-notifications"
   group_by: ['alertname']
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 1h
 
 receivers:
-  - name: "slack-notifications"
-    slack_configs:
-      - api_url: "{{ alertmanager_slack_webhook_url }}"
-        channel: "{{ alertmanager_slack_channel }}"
+  - name: "telegram-notifications"
+    telegram_configs:
+      - bot_token: "{{ telegram_bot_token }}"
+        chat_id: {{ telegram_chat_id }}
         send_resolved: true
 
 inhibit_rules:
