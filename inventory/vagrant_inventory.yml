@@ -1,0 +1,7 @@
+all:
+  hosts:
+    monitoring-server:
+      ansible_host: 127.0.0.1
+      ansible_port: 2202
+      ansible_user: vagrant
+      ansible_private_key_file: .vagrant/machines/monitoring-server/virtualbox/private_key
