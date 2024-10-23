@@ -1,0 +1,19 @@
+---
+- name: Install Docker Loki logging plugin
+  shell: docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+  args:
+    creates: /var/lib/docker/plugins/*/rootfs
+  register: install_loki_plugin
+  changed_when: "'Installed plugin' in install_loki_plugin.stdout"
+
+- name: Configure Docker daemon for Loki logging
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    mode: '0644'
+
+- name: Restart Docker service
+  service:
+    name: docker
+    state: restarted
+  

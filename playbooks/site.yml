@@ -8,5 +8,5 @@
       - grafana
       - alertmanager
       - loki
-
-
+      - docker_logging
+      
