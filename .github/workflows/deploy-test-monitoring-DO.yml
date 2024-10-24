@@ -46,6 +46,7 @@ jobs:
 
             if [ "$DROPLET_STATUS" == "active" ]; then
               echo "Droplet is active!"
+              sleep 60
               break
             else
               echo "Waiting for droplet to be active... Current status: $DROPLET_STATUS"
