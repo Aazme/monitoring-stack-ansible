@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   DO_API_URL: "https://api.digitalocean.com/v2/droplets"
