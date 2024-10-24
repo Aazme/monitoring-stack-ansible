@@ -57,7 +57,14 @@ jobs:
               exit 1
             fi
           done
-
+      - name: Fetch Droplet IP Address
+        id: get_ip
+        run: |
+          IP_ADDRESS=$(curl -X GET -H 'Content-Type: application/json' \
+            -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
+            "https://api.digitalocean.com/v2/droplets/${{ env.droplet_id }}" | jq -r '.droplet.networks.v4[0].ip_address')
+          echo "ip=${IP_ADDRESS}" >> $GITHUB_ENV
+      
       - name: Create SSH Private Key File
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ./lido-task-dg
