@@ -1,0 +1,86 @@
+name: Deploy and Test Monitoring Stack
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DO_API_URL: "https://api.digitalocean.com/v2/droplets"
+  DROPLET_NAME: "monitoring-stack-ansible-droplet"
+  DROPLET_SIZE: "s-2vcpu-4gb-120gb-intel"
+  DROPLET_REGION: "fra1"
+  DROPLET_IMAGE: "ubuntu-22-04-x64"
+  VPC_UUID: "${{ secrets.VPC_ID }}"
+
+jobs:
+  create-run-test-destroy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Create a DigitalOcean Droplet
+      - name: Create DigitalOcean Droplet
+        id: create_droplet
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+            -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
+            -d '{
+              "name": "${{ env.DROPLET_NAME }}",
+              "size": "${{ env.DROPLET_SIZE }}",
+              "region": "${{ env.DROPLET_REGION }}",
+              "image": "${{ env.DROPLET_IMAGE }}",
+              "vpc_uuid": "${{ env.VPC_UUID }}",
+              "ssh_keys": ["${{ secrets.SSH_KEY_ID }}"]
+            }' \
+            $DO_API_URL
+          echo "::set-output name=droplet_id::$(jq -r '.droplet.id')"
+
+      # Wait for the droplet to become active
+      - name: Wait for Droplet to be Active
+        run: |
+          while [ "$(curl -X GET -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.DO_API_TOKEN }}' \
+            "https://api.digitalocean.com/v2/droplets/${{ steps.create_droplet.outputs.droplet_id }}" | jq -r '.droplet.status')" != "active" ]; do
+              echo "Waiting for droplet to be active..."
+              sleep 10
+          done
+
+      # Fetch Droplet IP Address
+      - name: Fetch Droplet IP Address
+        id: get_ip
+        run: |
+          IP_ADDRESS=$(curl -X GET -H 'Content-Type: application/json' \
+            -H 'Authorization: Bearer ${{ secrets.DO_API_TOKEN }}' \
+            "https://api.digitalocean.com/v2/droplets/${{ steps.create_droplet.outputs.droplet_id }}" | jq -r '.droplet.networks.v4[0].ip_address')
+          echo "::set-output name=ip::${IP_ADDRESS}"
+
+      # Run the Ansible Playbook on the droplet
+      - name: Run Ansible Playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: playbooks/site.yml
+          inventory: inventory/inventory.yml
+          extra_args: "-i ${{ steps.get_ip.outputs.ip }}, -u root --private-key ${{ secrets.SSH_PRIVATE_KEY }}"
+        
+      # Install pytest and run tests
+      - name: Install and Run pytest
+        run: |
+          pip install pytest testinfra
+          pytest --ansible-inventory=./inventory/inventory.yml --force-ansible --connection=ansible
+
+      # Destroy the droplet after the test
+      - name: Destroy DigitalOcean Droplet
+        run: |
+          curl -X DELETE -H 'Content-Type: application/json' \
+            -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
+            "https://api.digitalocean.com/v2/droplets/${{ steps.create_droplet.outputs.droplet_id }}"
+
+      # Archive test results
+      - name: Archive Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-results
+          path: pytest_results/
