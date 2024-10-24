@@ -65,13 +65,15 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
             "https://api.digitalocean.com/v2/droplets/${{ env.droplet_id }}" | jq -r '.droplet.networks.v4[0].ip_address')
           echo "ip=${IP_ADDRESS}" >> $GITHUB_ENV
-
+      
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: playbooks/site.yml
-          inventory: inventory/inventory.yml
-          extra_args: "-i ${{ env.ip }}, -u root --private-key ${{ secrets.SSH_PRIVATE_KEY }}"
+          inventory: |
+            [monitoring]
+            ${{ env.ip }} ansible_user=root ansible_ssh_private_key_file=${{ secrets.SSH_PRIVATE_KEY }}
+
 
       - name: Install and Run pytest
         run: |
