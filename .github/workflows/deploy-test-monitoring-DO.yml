@@ -66,13 +66,16 @@ jobs:
             "https://api.digitalocean.com/v2/droplets/${{ env.droplet_id }}" | jq -r '.droplet.networks.v4[0].ip_address')
           echo "ip=${IP_ADDRESS}" >> $GITHUB_ENV
       
+      - name: Update Inventory File with Droplet IP
+        run: |
+          sed -i "s/ansible_host: .*/ansible_host: ${{ env.ip }}/" inventory/inventory.yml
+      
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: playbooks/site.yml
-          inventory: |
-            [monitoring]
-            ${{ env.ip }} ansible_user=root ansible_ssh_private_key_file=${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: inventory/inventory.yml
+
 
 
       - name: Install and Run pytest
