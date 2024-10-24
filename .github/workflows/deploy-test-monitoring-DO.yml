@@ -58,24 +58,21 @@ jobs:
             fi
           done
 
-      - name: Fetch Droplet IP Address
-        id: get_ip
+      - name: Create SSH Private Key File
         run: |
-          IP_ADDRESS=$(curl -X GET -H 'Content-Type: application/json' \
-            -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
-            "https://api.digitalocean.com/v2/droplets/${{ env.droplet_id }}" | jq -r '.droplet.networks.v4[0].ip_address')
-          echo "ip=${IP_ADDRESS}" >> $GITHUB_ENV
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ./lido-task-dg
+          chmod 600 ./lido-task-dg
       
       - name: Update Inventory File with Droplet IP
         run: |
           sed -i "s/ansible_host: .*/ansible_host: ${{ env.ip }}/" inventory/inventory.yml
+          cat  inventory/inventory.yml
       
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: playbooks/site.yml
           inventory: inventory/inventory.yml
-
 
 
       - name: Install and Run pytest
