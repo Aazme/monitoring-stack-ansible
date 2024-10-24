@@ -12,7 +12,7 @@ env:
   DROPLET_SIZE: "s-2vcpu-4gb-120gb-intel"
   DROPLET_REGION: "fra1"
   DROPLET_IMAGE: "ubuntu-22-04-x64"
-  VPC_UUID: "your-vpc-uuid"
+  VPC_UUID: "${{ secrets.VPC_ID }}"
 
 jobs:
   create-run-test-destroy:
