@@ -74,12 +74,20 @@ jobs:
         run: |
           sed -i "s/ansible_host: .*/ansible_host: ${{ env.ip }}/" inventory/inventory.yml
           cat  inventory/inventory.yml
-      
+            
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: playbooks/site.yml
-          inventory: inventory/inventory.yml
+          directory: ./
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          inventory: |
+            all:
+              hosts:
+                digitalocean:
+                  ansible_host: ${{ env.ip }}
+                  ansible_user: root
+                  ansible_ssh_private_key_file: ./lido-task-dg
 
 
       - name: Install and Run pytest
