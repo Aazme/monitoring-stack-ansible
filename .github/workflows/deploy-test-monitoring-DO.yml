@@ -101,9 +101,3 @@ jobs:
           curl -X DELETE -H 'Content-Type: application/json' \
             -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
             "https://api.digitalocean.com/v2/droplets/${{ env.droplet_id }}"
-
-      - name: Archive Test Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: pytest-results
-          path: pytest_results/
