@@ -2,16 +2,19 @@
 
 - name: Deploy Grafana dashboards
   template:
-    src: grafana_dashboard.json.j2
-    dest: /var/lib/grafana/grafana_dashboard.json
+    src: "{{ item }}"
+    dest: "/var/lib/grafana/{{ item | basename }}"
     mode: '0644'
+  loop: "{{ query('fileglob', 'templates/dashboards/*.json.j2') }}"
+  when: item is not none
 
-- name: Import Grafana dashboard
+- name: Import Grafana dashboards
   grafana_dashboard:
-    path: "/var/lib/grafana/grafana_dashboard.json"
+    path: "/var/lib/grafana/{{ item | basename }}"
     state: present
     validate_certs: false
     overwrite: true
     url_username: "{{ grafana_username }}"
     url_password: "{{ grafana_password }}"
-    url: "{{grafana_url}}"
+    url: "{{ grafana_url }}"
+  loop: "{{ query('fileglob', 'templates/dashboards/*.json.j2') }}"
