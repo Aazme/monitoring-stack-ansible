@@ -93,8 +93,10 @@ jobs:
 
       - name: Install and Run pytest
         run: |
-          pip install pytest testinfra
+          pip uninstall -y testinfra
+          pip install pytest pytest-testinfra
           pytest --ansible-inventory=./inventory/inventory.yml --force-ansible --connection=ansible
+
 
       - name: Destroy DigitalOcean Droplet
         if: always() # Ensures this step runs even if previous steps fail
