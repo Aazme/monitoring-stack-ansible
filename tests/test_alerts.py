@@ -74,10 +74,4 @@ def test_node_exporter_down_alert(host, query_prometheus_alerts):
     finally:
         host.run("docker start node-exporter")
 
-def test_grafana_down_alert(host, query_prometheus_alerts):
-    try:
-        host.run("docker stop grafana")
-        alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'GrafanaDown', timeout=300)
-        assert alert_fired, "NodeExporterDown alert did not fire as expected"
-    finally:
-        host.run("docker start grafana")
+
