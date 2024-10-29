@@ -9,6 +9,7 @@
       - python3-pip
       - virtualenv
       - python3-setuptools
+      - stress
     state: latest
     update_cache: true
   retries: 5
