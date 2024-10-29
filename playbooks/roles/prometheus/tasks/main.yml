@@ -4,9 +4,16 @@
     path: /etc/prometheus
     state: directory
     mode: '0755'
+
 - name: Create Prometheus Data directory
   file:
     path: /etc/prometheus/data
+    state: directory
+    mode: '0755'
+
+- name: Create Pushgateway configuration directory
+  file:
+    path: /etc/pushgateway
     state: directory
     mode: '0755'
 
@@ -38,4 +45,16 @@
       prometheus_job: "prometheus"
     restart_policy: always
 
-
+- name: Deploy Pushgateway container
+  docker_container:
+    name: pushgateway
+    image: prom/pushgateway
+    ports:
+      - "9091:9091"
+    volumes:
+      - "/etc/pushgateway:/etc/pushgateway"
+    networks:
+      - name: monitoring
+    labels:
+      prometheus_job: "pushgateway"
+    restart_policy: always

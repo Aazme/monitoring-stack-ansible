@@ -18,6 +18,10 @@ scrape_configs:
   - job_name: "cadvisor"
     static_configs:
       - targets: ["cadvisor:8080"]
+      
+  - job_name: 'pushgateway'
+    static_configs:
+      - targets: ['pushgateway:9091']
 
   - job_name: "docker_containers"
     docker_sd_configs:
