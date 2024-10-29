@@ -1,12 +1,8 @@
-import pytest
-
-
-
-def test_docker_is_installed(host):
-    docker = host.package("docker-ce")
-    assert docker.is_installed
+# tests/test_services.py
+import testinfra
 
 def test_services_are_running_and_enabled(host):
+    """Ensure required services are running and enabled."""
     services = ["docker"]
     for service_name in services:
         service = host.service(service_name)
@@ -14,6 +10,7 @@ def test_services_are_running_and_enabled(host):
         assert service.is_enabled
 
 def test_docker_containers_are_running(host):
+    """Ensure critical Docker containers are running."""
     containers = [
         "prometheus",
         "grafana",
@@ -27,6 +24,7 @@ def test_docker_containers_are_running(host):
         assert container.is_running
 
 def test_ports_are_listening(host):
+    """Ensure critical services' ports are open and listening."""
     ports = [
         ("0.0.0.0", 9090),   # Prometheus
         ("0.0.0.0", 3000),   # Grafana
@@ -36,9 +34,8 @@ def test_ports_are_listening(host):
         ("0.0.0.0", 3100),   # Loki
     ]
     for address, port in ports:
-        socket = host.socket("tcp://{}:{}".format(address, port))
+        socket = host.socket(f"tcp://{address}:{port}")
         assert socket.is_listening
-
 def test_prometheus_targets_are_up(host):
     cmd = host.run("curl -s http://localhost:9090/api/v1/targets")
     assert cmd.rc == 0

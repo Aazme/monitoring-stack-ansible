@@ -1,22 +1,90 @@
 groups:
   - name: NodeAlerts
     rules:
-      - alert: HighNodeCPUUsage
+      # High CPU Usage
+      - alert: HighCPUUsage
         expr: |
-          100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > {{ cpu_usage_threshold | default(80) }}
-        for: 2m
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > {{ cpu_usage_threshold | default(80) }}
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: warning
         annotations:
-          summary: "High CPU usage on {% raw %}{{ $labels.instance }}{% endraw %}"
-          description: "Node {% raw %}{{ $labels.instance }}{% endraw %} is using high CPU. Value: {% raw %}{{ $value }}{% endraw %}%"
+          summary: "High CPU usage on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "CPU usage is above {{ cpu_usage_threshold | default(80) }}%. Current value: {{ '{{' }} $value {{ '}}' }}%"
 
-      - alert: HighNodeMemoryUsage
+      # High Memory Usage
+      - alert: HighMemoryUsage
         expr: |
-          100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > {{ memory_usage_threshold | default(80) }}
-        for: 2m
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > {{ memory_usage_threshold | default(80) }}
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: warning
         annotations:
-          summary: "High Memory usage on {% raw %}{{ $labels.instance }}{% endraw %}"
-          description: "Node {% raw %}{{ $labels.instance }}{% endraw %} is using high memory. Value: {% raw %}{{ $value }}{% endraw %}%"
+          summary: "High Memory usage on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "Memory usage is above {{ memory_usage_threshold | default(80) }}%. Current value: {{ '{{' }} $value {{ '}}' }}%"
+
+      # Disk Space Low
+      - alert: DiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < {{ disk_space_threshold | default(20) }}
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low Disk Space on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "Disk space is below {{ disk_space_threshold | default(20) }}%. Available space: {{ '{{' }} $value {{ '}}' }}%"
+
+      # High Disk I/O Usage
+      - alert: HighDiskIOUsage
+        expr: |
+          (irate(node_disk_io_time_seconds_total[1m]) * 100) > {{ disk_io_threshold | default(60) }}
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Disk I/O usage on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "Disk I/O usage is above {{ disk_io_threshold | default(60) }}%. Current value: {{ '{{' }} $value {{ '}}' }}%"
+
+      # OOM Kill Detected
+      - alert: OOMKillDetected
+        expr: |
+          increase(node_vmstat_oom_kill[1m]) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "OOM Kill detected on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "Out of Memory kill detected. Action required."
+
+      # Filesystem Inodes Low
+      - alert: DiskInodesLow
+        expr: |
+          (node_filesystem_files_free / node_filesystem_files) * 100 < {{ inode_threshold | default(10) }}
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low Inodes on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "Available inodes are below {{ inode_threshold | default(10) }}%. Current value: {{ '{{' }} $value {{ '}}' }}%"
+
+
+      # Node Exporter Down
+      - alert: NodeExporterDown
+        expr: |
+          up{job="node_exporter"} == 0
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node Exporter is down on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "Node Exporter has not been reachable for more than 10 seconds on instance {{ '{{' }} $labels.instance {{ '}}' }}."
+
+      # Grafana Down
+      - alert: GrafanaDown
+        expr: |
+          up{instance="grafana"} == 0
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        labels:
+          severity: critical
+        annotations:
+          summary: "Grafana is down on {{ '{{' }} $labels.instance {{ '}}' }}"
+          description: "Grafana has not been reachable for more than 10 seconds on instance {{ '{{' }} $labels.instance {{ '}}' }}."
