@@ -95,6 +95,16 @@ def test_high_disk_io_alert(host, query_prometheus_alerts):
         push_metric(host, job="disk_io_test", instance="localhost", metric_name="node_disk_io_time_seconds_total", value=4000)
         time.sleep(2)
         push_metric(host, job="disk_io_test", instance="localhost", metric_name="node_disk_io_time_seconds_total", value=5000)
+        time.sleep(2)
+        push_metric(host, job="disk_io_test", instance="localhost", metric_name="node_disk_io_time_seconds_total", value=6000)
+        time.sleep(2)
+        push_metric(host, job="disk_io_test", instance="localhost", metric_name="node_disk_io_time_seconds_total", value=7000)
+        time.sleep(2)
+        push_metric(host, job="disk_io_test", instance="localhost", metric_name="node_disk_io_time_seconds_total", value=8000)
+        time.sleep(2)
+        push_metric(host, job="disk_io_test", instance="localhost", metric_name="node_disk_io_time_seconds_total", value=9000)
+        time.sleep(2)
+        push_metric(host, job="disk_io_test", instance="localhost", metric_name="node_disk_io_time_seconds_total", value=10000)
         
         # Wait for the alert to fire
         alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'HighDiskIOUsage')
