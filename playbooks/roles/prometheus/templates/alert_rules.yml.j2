@@ -5,7 +5,7 @@ groups:
       - alert: HighCPUUsage
         expr: |
           100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > {{ cpu_usage_threshold | default(80) }}
-        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: warning
         annotations:
@@ -16,7 +16,7 @@ groups:
       - alert: HighMemoryUsage
         expr: |
           (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > {{ memory_usage_threshold | default(80) }}
-        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: warning
         annotations:
@@ -27,7 +27,7 @@ groups:
       - alert: DiskSpaceLow
         expr: |
           (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < {{ disk_space_threshold | default(20) }}
-        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: warning
         annotations:
@@ -38,7 +38,7 @@ groups:
       - alert: HighDiskIOUsage
         expr: |
           (irate(node_disk_io_time_seconds_total[1m]) * 100) > {{ disk_io_threshold | default(40) }}
-        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: critical
         annotations:
@@ -59,7 +59,7 @@ groups:
       - alert: DiskInodesLow
         expr: |
           (node_filesystem_files_free / node_filesystem_files) * 100 < {{ inode_threshold | default(10) }}
-        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: warning
         annotations:
@@ -71,7 +71,7 @@ groups:
       - alert: NodeExporterDown
         expr: |
           up{job="node_exporter"} == 0
-        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: critical
         annotations:
@@ -82,7 +82,7 @@ groups:
       - alert: GrafanaDown
         expr: |
           up{instance="grafana"} == 0
-        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: critical
         annotations:
