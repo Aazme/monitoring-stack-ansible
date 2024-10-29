@@ -2,7 +2,7 @@
 import pytest
 
 @pytest.fixture
-def setup_alpine_container(host, docker_client):
+def setup_alpine_container(host):
     """Sets up a test Alpine container and yields its name and log message."""
     container_name = "test-log-container"
     log_message = "Test log message for Loki"
