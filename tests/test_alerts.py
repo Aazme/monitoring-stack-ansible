@@ -30,7 +30,7 @@ def wait_for_alert_to_fire(host, query_func, alert_name, timeout=180, interval=1
 
 def test_high_memory_alert(host, query_prometheus_alerts):
     stress_command = (
-        "stress --vm-bytes $(awk '/MemAvailable/ {printf \"%d\\n\", $2 * 0.85;}' /proc/meminfo)k --vm-keep -m 1 &"
+        "stress --vm-bytes $(awk '/MemAvailable/ {printf \"%d\\n\", $2 * 0.90;}' /proc/meminfo)k --vm-keep -m 2 &"
     )
     try:
         host.run(stress_command)
@@ -40,7 +40,7 @@ def test_high_memory_alert(host, query_prometheus_alerts):
         host.run("pkill -f 'stress'")
 
 def test_high_cpu_alert(host, query_prometheus_alerts):
-    cpu_stress_command = "stress --cpu $(nproc) --timeout 90 &"
+    cpu_stress_command = "stress --cpu $(nproc) --timeout 180 &"
     try:
         host.run(cpu_stress_command)
         alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'HighCPUUsage')
@@ -58,7 +58,7 @@ def test_disk_space_low_alert(host, query_prometheus_alerts):
         host.run("rm -f /tmp/bigfile")
 
 def test_high_disk_io_alert(host, query_prometheus_alerts):
-    disk_io_command = "dd if=/dev/zero of=/tmp/testfile bs=3M count=4000"
+    disk_io_command = "dd if=/dev/zero of=/tmp/testfile bs=10M count=3000 &"
     try:
         host.run(disk_io_command)
         alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'HighDiskIOUsage')
