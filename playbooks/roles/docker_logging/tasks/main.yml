@@ -12,6 +12,9 @@
     dest: /etc/docker/daemon.json
     mode: '0644'
   notify: Restart Docker
+  
+- name: Force handlers to run immediately
+  meta: flush_handlers
 
 
   
