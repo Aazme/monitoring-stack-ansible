@@ -38,8 +38,18 @@ def wait_for_alert_to_fire(host, query_func, alert_name, timeout=180, interval=1
 # Test High Memory Usage Alert
 def test_high_memory_alert(host, query_prometheus_alerts):
     try:
-        push_metric(host, job="memory_test", instance="localhost", metric_name="node_memory_MemAvailable_bytes", value=10)
         push_metric(host, job="memory_test", instance="localhost", metric_name="node_memory_MemTotal_bytes", value=2000000000)
+        push_metric(host, job="memory_test", instance="localhost", metric_name="node_memory_MemAvailable_bytes", value=10)
+        time.sleep(2)
+        push_metric(host, job="memory_test", instance="localhost", metric_name="node_memory_MemAvailable_bytes", value=10)
+        time.sleep(2)
+        push_metric(host, job="memory_test", instance="localhost", metric_name="node_memory_MemAvailable_bytes", value=10)
+        time.sleep(2)
+        push_metric(host, job="memory_test", instance="localhost", metric_name="node_memory_MemAvailable_bytes", value=10)
+        time.sleep(2)
+        push_metric(host, job="memory_test", instance="localhost", metric_name="node_memory_MemAvailable_bytes", value=10)
+        time.sleep(2)
+
         alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'HighMemoryUsage')
         assert alert_fired, "HighMemoryUsage alert did not fire as expected"
     finally:
@@ -48,8 +58,17 @@ def test_high_memory_alert(host, query_prometheus_alerts):
 # Test High CPU Usage Alert
 def test_high_cpu_alert(host, query_prometheus_alerts):
     try:
-        push_metric(host, job="cpu_test", instance="localhost", metric_name="node_cpu_seconds_total{mode=\"idle\"}", value=10)
         push_metric(host, job="cpu_test", instance="localhost", metric_name="node_cpu_seconds_total", value=10000)
+        push_metric(host, job="cpu_test", instance="localhost", metric_name="node_cpu_seconds_total{mode=\"idle\"}", value=10)
+        time.sleep(2)
+        push_metric(host, job="cpu_test", instance="localhost", metric_name="node_cpu_seconds_total{mode=\"idle\"}", value=10)
+        time.sleep(2)
+        push_metric(host, job="cpu_test", instance="localhost", metric_name="node_cpu_seconds_total{mode=\"idle\"}", value=10)
+        time.sleep(2)
+        push_metric(host, job="cpu_test", instance="localhost", metric_name="node_cpu_seconds_total{mode=\"idle\"}", value=10)
+        time.sleep(2)
+        push_metric(host, job="cpu_test", instance="localhost", metric_name="node_cpu_seconds_total{mode=\"idle\"}", value=10)
+        time.sleep(2)
         alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'HighCPUUsage')
         assert alert_fired, "HighCPUUsage alert did not fire as expected"
     finally:
@@ -58,8 +77,8 @@ def test_high_cpu_alert(host, query_prometheus_alerts):
 # Test Disk Space Low Alert
 def test_disk_space_low_alert(host, query_prometheus_alerts):
     try:
-        push_metric(host, job="disk_test", instance="localhost", metric_name="node_filesystem_avail_bytes", value=1000)
         push_metric(host, job="disk_test", instance="localhost", metric_name="node_filesystem_size_bytes", value=10000000000)
+        push_metric(host, job="disk_test", instance="localhost", metric_name="node_filesystem_avail_bytes", value=1000)
         alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'DiskSpaceLow')
         assert alert_fired, "DiskSpaceLow alert did not fire as expected"
     finally:

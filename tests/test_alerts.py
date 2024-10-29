@@ -58,7 +58,7 @@ def test_disk_space_low_alert(host, query_prometheus_alerts):
         host.run("rm -f /tmp/bigfile")
 
 def test_high_disk_io_alert(host, query_prometheus_alerts):
-    disk_io_command = "dd if=/dev/zero of=/tmp/testfile bs=10M count=3000 &"
+    disk_io_command = "dd if=/dev/zero of=/tmp/testfile bs=10M count=5000 &"
     try:
         host.run(disk_io_command)
         alert_fired = wait_for_alert_to_fire(host, query_prometheus_alerts, 'HighDiskIOUsage')
