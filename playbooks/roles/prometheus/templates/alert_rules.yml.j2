@@ -38,7 +38,7 @@ groups:
       - alert: HighDiskIOUsage
         expr: |
           (irate(node_disk_io_time_seconds_total[1m]) * 100) > {{ disk_io_threshold | default(40) }}
-        for: 30s # this need to be changed for production alerts, its 10s for test purposes only
+        for: 10s # this need to be changed for production alerts, its 10s for test purposes only
         labels:
           severity: critical
         annotations:
