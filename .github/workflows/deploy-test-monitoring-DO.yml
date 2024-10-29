@@ -97,7 +97,12 @@ jobs:
           pytest --ansible-inventory=./inventory/inventory.yml --force-ansible --connection=ansible
 
       - name: Destroy DigitalOcean Droplet
+        if: always() # Ensures this step runs even if previous steps fail
         run: |
-          curl -X DELETE -H 'Content-Type: application/json' \
-            -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
-            "https://api.digitalocean.com/v2/droplets/${{ env.droplet_id }}"
+          if [ -n "${{ env.droplet_id }}" ]; then
+            curl -X DELETE -H 'Content-Type: application/json' \
+              -H "Authorization: Bearer ${{ secrets.DO_API_TOKEN }}" \
+              "https://api.digitalocean.com/v2/droplets/${{ env.droplet_id }}"
+          else
+            echo "Droplet ID not set; skipping deletion."
+          fi
