@@ -1,18 +1,13 @@
+# tests/test_loki_integration.py
 import json
 import time
 import testinfra
-import random
-import string
 from pytest import fail
-
-def generate_random_string(length=8):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 def test_alpine_log_delivery_to_loki(host, setup_alpine_container):
     """Test that logs from a test Alpine container are delivered to Loki."""
-    # Generate random container name and log message
-    container_name = generate_random_string()
-    log_message = generate_random_string()
+    # Extract container details from the fixture
+    container_name, log_message = setup_alpine_container
 
     loki_host = "localhost"  # Adjust if Loki is on a different host
     loki_port = "3100"
